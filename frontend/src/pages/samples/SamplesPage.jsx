@@ -1,28 +1,23 @@
 /**
  * src/pages/samples/SamplesPage.jsx
  * List sampel dengan filter lengkap + registrasi baru.
+ * FIXED: Proper API response handling + complete registration form
  */
 
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { samplesApi, sampleTypesApi } from '@/api/services'
+import { samplesApi, sampleTypesApi, categoriesApi } from '@/api/services'
 import { useApiMutation } from '@/hooks/useApi'
 import {
   PageHeader, StatusBadge, Pagination,
   EmptyState, PageLoader, FormField,
 } from '@/components/common'
-import { Plus, Search, Filter, X } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { Plus, Search, X } from 'lucide-react'
 
 // ── Filter bar ────────────────────────────────────────────────────────────────
 function FilterBar({ filters, onChange, onClear }) {
-  const { data: types } = useQuery({
-    queryKey: ['sample-types'],
-    queryFn: async () => { const { data } = await sampleTypesApi.list(); return data },
-  })
-
   return (
     <div className="card p-4 mb-5 flex flex-wrap gap-3 items-end">
       {/* Search */}
@@ -86,7 +81,6 @@ function FilterBar({ filters, onChange, onClear }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function SamplesPage() {
-  const navigate = useNavigate()
   const [filters, setFilters] = useState({ page: 1, page_size: 20 })
   const [showForm, setShowForm] = useState(false)
 
@@ -164,8 +158,8 @@ export default function SamplesPage() {
                           <p className="text-xs text-slate-400 font-mono">WO: {s.work_order}</p>
                         )}
                       </td>
-                      <td className="text-sm text-slate-600">{s.sample_type_name}</td>
-                      <td className="text-sm text-slate-600">{s.product_category_name}</td>
+                      <td className="text-sm text-slate-600">{s.sample_type_name || '—'}</td>
+                      <td className="text-sm text-slate-600">{s.product_category_name || '—'}</td>
                       <td><StatusBadge value={s.urgency} /></td>
                       <td><StatusBadge value={s.status} /></td>
                       <td className="text-sm text-slate-500">{s.customer || '—'}</td>
@@ -209,14 +203,33 @@ export default function SamplesPage() {
 
 // ── Register Sample Modal ─────────────────────────────────────────────────────
 function RegisterSampleModal({ onClose, onSuccess }) {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm()
-
-  const { data: types } = useQuery({
-    queryKey: ['sample-types'],
-    queryFn: async () => { const { data } = await sampleTypesApi.list(); return data },
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      urgency: 'normal',
+    }
   })
 
-  console.log('types:', types)
+  const selectedType = watch('sample_type')
+
+  // Fetch sample types
+  const { data: typesData, isLoading: typesLoading } = useQuery({
+    queryKey: ['sample-types'],
+    queryFn: async () => {
+      const { data } = await sampleTypesApi.list()
+      // Normalize response - bisa jadi array langsung atau {results: [...]}
+      return Array.isArray(data) ? data : (data?.results || [])
+    },
+  })
+
+  // Fetch product categories (filtered by selected type jika ada)
+  const { data: categoriesData, isLoading: catsLoading } = useQuery({
+    queryKey: ['product-categories', selectedType],
+    queryFn: async () => {
+      const params = selectedType ? { sample_type: selectedType } : {}
+      const { data } = await categoriesApi.list(params)
+      return Array.isArray(data) ? data : (data?.results || [])
+    },
+  })
 
   const { mutate, isPending } = useApiMutation(
     (data) => samplesApi.create(data),
@@ -240,7 +253,7 @@ function RegisterSampleModal({ onClose, onSuccess }) {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg
                       max-h-[80vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4
-                        flex items-center justify-between rounded-t-2xl">
+                        flex items-center justify-between rounded-t-2xl z-10">
           <h2 className="font-semibold text-slate-800">Daftar Sampel Baru</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
@@ -264,38 +277,74 @@ function RegisterSampleModal({ onClose, onSuccess }) {
             />
           </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Tipe Sampel" required error={errors.sample_type?.message}>
-              <select
-                className="form-select"
-                {...register('sample_type', { required: 'Tipe wajib dipilih.' })}
-              >
-                <option value="">
-                  {!types ? 'Loading...' : 'Pilih tipe...'}
-                </option>
+          <FormField label="Tipe Sampel" required error={errors.sample_type?.message}>
+            <select
+              className={errors.sample_type ? 'form-input-error' : 'form-select'}
+              {...register('sample_type', { required: 'Tipe wajib dipilih.' })}
+              disabled={typesLoading}
+            >
+              <option value="">
+                {typesLoading ? 'Memuat...' : 'Pilih tipe sampel...'}
+              </option>
+              {typesData?.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          </FormField>
 
-                {(types?.results || types || []).map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </FormField>
+          <FormField label="Kategori Produk" required error={errors.product_category?.message}>
+            <select
+              className={errors.product_category ? 'form-input-error' : 'form-select'}
+              {...register('product_category', { required: 'Kategori wajib dipilih.' })}
+              disabled={!selectedType || catsLoading}
+            >
+              <option value="">
+                {!selectedType 
+                  ? 'Pilih tipe sampel dulu...' 
+                  : catsLoading 
+                  ? 'Memuat...' 
+                  : 'Pilih kategori produk...'}
+              </option>
+              {categoriesData?.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            {selectedType && categoriesData?.length === 0 && (
+              <p className="text-xs text-amber-600 mt-1">
+                Belum ada kategori untuk tipe sampel ini. Tambahkan dulu di master data.
+              </p>
+            )}
+          </FormField>
 
-            <FormField label="Urgensi">
-              <select className="form-select" {...register('urgency')}>
-                <option value="normal">Normal</option>
-                <option value="urgent">Urgent</option>
-                <option value="rush">Rush</option>
-              </select>
-            </FormField>
-          </div>
+          <FormField label="Urgensi">
+            <select className="form-select" {...register('urgency')}>
+              <option value="normal">Normal</option>
+              <option value="urgent">Urgent</option>
+              <option value="rush">Rush</option>
+            </select>
+          </FormField>
 
           <FormField label="Work Order">
             <input
               className="form-input"
               placeholder="Nomor WO (opsional)"
               {...register('work_order')}
+            />
+          </FormField>
+
+          <FormField label="Customer / Requester">
+            <input
+              className="form-input"
+              placeholder="Nama customer atau requester"
+              {...register('customer')}
+            />
+          </FormField>
+
+          <FormField label="Batch Code">
+            <input
+              className="form-input"
+              placeholder="Kode batch (opsional)"
+              {...register('batch_code')}
             />
           </FormField>
 
@@ -312,7 +361,11 @@ function RegisterSampleModal({ onClose, onSuccess }) {
             <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
               Batal
             </button>
-            <button type="submit" disabled={isPending} className="btn btn-primary flex-1">
+            <button 
+              type="submit" 
+              disabled={isPending || typesLoading} 
+              className="btn btn-primary flex-1"
+            >
               {isPending ? 'Menyimpan...' : 'Daftar Sampel'}
             </button>
           </div>

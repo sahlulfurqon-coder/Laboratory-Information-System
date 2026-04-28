@@ -31,12 +31,12 @@ class ControlledDocumentViewSet(viewsets.ModelViewSet):
     POST /api/documents/{id}/archive/             → arsipkan
     """
     queryset = ControlledDocument.objects.all().select_related(
-        'category', 'uploaded_by', 'approved_by'
+        'category', 'created_by', 'approved_by'
     ).prefetch_related('revisions').order_by('-created_at')
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['category', 'status']
     search_fields = ['doc_number', 'title', 'tags']
-    ordering_fields = ['uploaded_at', 'effective_date', 'doc_number']
+    ordering_fields = ['created_at', 'effective_date', 'doc_number']
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):

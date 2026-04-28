@@ -155,6 +155,10 @@ export const specsApi = {
   detail:             (id)     => api.get(`/specifications/${id}/`),
   create:             (d)      => api.post('/specifications/', d),
   update:             (id, d)  => api.put(`/specifications/${id}/`, d),
+  
+  // TAMBAHKAN BARIS INI UNTUK DELETE SPESIFIKASI
+  delete:             (id)     => api.delete(`/specifications/${id}/`), 
+
   submitForApproval:  (id)     => api.post(`/specifications/${id}/submit_for_approval/`),
   approve:            (id)     => api.post(`/specifications/${id}/approve/`),
   reject:             (id, d)  => api.post(`/specifications/${id}/reject/`, d),
@@ -189,25 +193,35 @@ export const complaintsApi = {
   createCapa: (complaintId, d)    => api.post(`/complaints/${complaintId}/capas/`, d),
   updateCapa: (complaintId, id, d)=> api.put(`/complaints/${complaintId}/capas/${id}/`, d),
   verifyCapa: (complaintId, id, d)=> api.post(`/complaints/${complaintId}/capas/${id}/verify/`, d),
+  deleteCapa: (complaintId, id)   => api.delete(`/complaints/${complaintId}/capas/${id}/`),
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DOCUMENTS
 // ══════════════════════════════════════════════════════════════════════════════
 export const documentsApi = {
-  list:               (params) => api.get('/documents/', { params: toParams(params) }),
-  detail:             (id)     => api.get(`/documents/${id}/`),
-  create:             (formData) =>
+  list: (params) => api.get('/documents/', { params: toParams(params) }),
+  detail: (id) => api.get(`/documents/${id}/`),
+  create: (formData) =>
     api.post('/documents/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  submitForApproval:  (id)     => api.post(`/documents/${id}/submit_for_approval/`),
-  approve:            (id)     => api.post(`/documents/${id}/approve/`),
-  revise:             (id, fd) =>
+  
+  // Tambahkan fungsi delete untuk ControlledDocument
+  delete: (id) => api.delete(`/documents/${id}/`),
+
+  submitForApproval: (id) => api.post(`/documents/${id}/submit_for_approval/`),
+  approve: (id) => api.post(`/documents/${id}/approve/`),
+  
+  revise: (id, fd) =>
     api.post(`/documents/${id}/revise/`, fd, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  archive:            (id)     => api.post(`/documents/${id}/archive/`),
+    
+  archive: (id) => api.post(`/documents/${id}/archive/`),
+
+  // Tambahkan untuk mengambil kategori dokumen (untuk dropdown filter)
+  categories: () => api.get('/document-categories/'),
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -231,23 +245,47 @@ export const rndApi = {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
 // INVENTORY
 // ══════════════════════════════════════════════════════════════════════════════
 export const inventoryApi = {
-  list:           (params) => api.get('/inventory/', { params: toParams(params) }),
-  detail:         (id)     => api.get(`/inventory/${id}/`),
-  create:         (d)      => api.post('/inventory/', d),
-  update:         (id, d)  => api.put(`/inventory/${id}/`, d),
-  lowStock:       ()       => api.get('/inventory/low_stock/'),
-  expiryWarning:  ()       => api.get('/inventory/expiry_warning/'),
-  addStock:       (id, d)  => api.post(`/inventory/${id}/add_stock/`, d),
-  useStock:       (id, d)  => api.post(`/inventory/${id}/use_stock/`, d),
-  movements:      (id)     => api.get(`/inventory/${id}/movements/`),
+  // Inventory Items
+  // Pastikan fungsi toParams tersedia jika Anda menggunakannya untuk membersihkan object params
+  list: (params) => api.get('/inventory/', { params: params }), 
+  detail: (id) => api.get(`/inventory/${id}/`),
+  create: (d) => api.post('/inventory/', d),
+  
+  // Gunakan PATCH agar lebih aman saat update sebagian data
+  update: (id, d) => api.patch(`/inventory/${id}/`, d), 
+  delete: (id) => api.delete(`/inventory/${id}/`),
+  
+  // Dashboard & Alerts
+  // Ini sudah benar sesuai dengan @action(detail=False) di InventoryItemViewSet
+  lowStock: () => api.get('/inventory/low_stock/'),
+  expiryWarning: () => api.get('/inventory/expiry_warning/'),
+  
+  // Stock Actions
+  // Ini sinkron dengan @action(detail=True) di backend
+  addStock: (id, d) => api.post(`/inventory/${id}/add_stock/`, d),
+  useStock: (id, d) => api.post(`/inventory/${id}/use_stock/`, d),
+  movements: (id) => api.get(`/inventory/${id}/movements/`),
+
+  // Categories 
+  // Pastikan endpoint ini sesuai dengan yang terdaftar di urls.py backend
+  listCategories: () => api.get('/item-categories/'), 
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// PURCHASE REQUESTS
+// ══════════════════════════════════════════════════════════════════════════════
 export const purchaseApi = {
   list:    (params) => api.get('/purchase-requests/', { params: toParams(params) }),
+  detail:  (id)     => api.get(`/purchase-requests/${id}/`), // <-- TAMBAHKAN INI
   create:  (d)      => api.post('/purchase-requests/', d),
+  update:  (id, d)  => api.put(`/purchase-requests/${id}/`, d), // <-- TAMBAHKAN INI
+  delete:  (id)     => api.delete(`/purchase-requests/${id}/`), // <-- TAMBAHKAN INI
+  
+  // Workflow Actions
   approve: (id)     => api.post(`/purchase-requests/${id}/approve/`),
   reject:  (id, d)  => api.post(`/purchase-requests/${id}/reject/`, d),
   ordered: (id)     => api.post(`/purchase-requests/${id}/ordered/`),

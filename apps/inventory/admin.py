@@ -14,7 +14,7 @@ class StockMovementInline(admin.TabularInline):
     ordering = ('-performed_at',)
 
     def has_add_permission(self, request, obj=None):
-        return False # Penambahan stok sebaiknya via model StockMovement langsung
+        return False  # Penambahan stok sebaiknya via model StockMovement langsung
 
 
 # ─── ADMIN CLASSES ────────────────────────────────────────────────────────────
@@ -57,10 +57,10 @@ class InventoryItemAdmin(admin.ModelAdmin):
     def current_stock_display(self, obj):
         """Memberi warna jika stok rendah atau habis."""
         if obj.is_out_of_stock:
-            color = "#c0392b" # Merah
+            color = "#c0392b"  # Merah
             weight = "bold"
         elif obj.is_low_stock:
-            color = "#d35400" # Oranye
+            color = "#d35400"  # Oranye
             weight = "bold"
         else:
             color = "inherit"
@@ -73,19 +73,26 @@ class InventoryItemAdmin(admin.ModelAdmin):
     current_stock_display.short_description = _("Stok")
 
     def expiry_status(self, obj):
-        """Menampilkan peringatan kadaluarsa."""
+        """Menampilkan peringatan kadaluarsa dengan format_html yang benar."""
         if not obj.nearest_expired_date:
             return "-"
         if obj.is_expired:
-            return format_html('<span style="color: red; font-weight: bold;">EXPIRED</span>')
+            # Perbaikan: Tambahkan placeholder {} dan argumen teks
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>', "EXPIRED")
         if obj.is_expiry_warning:
-            return format_html('<span style="color: #f39c12;">⚠️ Dekat</span>')
+            # Perbaikan: Tambahkan placeholder {} dan argumen teks
+            return format_html('<span style="color: #f39c12;">{}</span>', "⚠️ Dekat")
         return obj.nearest_expired_date
     expiry_status.short_description = _("Status Expired")
 
     def hazardous_badge(self, obj):
+        """Menampilkan badge B3 dengan format_html yang benar."""
         if obj.is_hazardous:
-            return format_html('<span title="Bahan Berbahaya" style="cursor:help;">⚠️ B3</span>')
+            # Perbaikan: Tambahkan placeholder {} untuk title dan teks
+            return format_html(
+                '<span title="{}" style="cursor:help;">{}</span>', 
+                "Bahan Berbahaya", "⚠️ B3"
+            )
         return ""
     hazardous_badge.short_description = _("B3")
 

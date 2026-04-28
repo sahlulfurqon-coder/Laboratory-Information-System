@@ -10,7 +10,7 @@ import {
   LayoutDashboard, FlaskConical, Microscope, FileText,
   Package, MessageSquareWarning, FolderOpen, TestTubeDiagonal,
   ShoppingCart, ClipboardList, ChevronDown, Menu, X,
-  LogOut, User, Bell, ChevronRight,
+  LogOut, User, Bell, ChevronRight, History
 } from 'lucide-react'
 
 // ── Navigasi per role ─────────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ const NAV_ITEMS = [
     roles: ['admin', 'qa_supervisor', 'rnd', 'analyst'],
   },
   {
-    label: 'R&D / Eksternal',
+    label: 'Eksternal',
     icon: TestTubeDiagonal,
     to: '/external',
     roles: ['admin', 'qa_supervisor', 'rnd'],
@@ -70,9 +70,15 @@ const NAV_ITEMS = [
     roles: ['admin', 'qa_supervisor'],
   },
   {
-    label: 'Audit Trail',
+    label: 'Laporan',
     icon: ClipboardList,
-    to: '/audit',
+    to: '/reports',
+    roles: ['admin', 'qa_supervisor'],
+  },
+  {
+    label: 'Audit-Log',
+    icon: History,
+    to: '/audit-log',
     roles: ['admin', 'qa_supervisor'],
   },
 ]

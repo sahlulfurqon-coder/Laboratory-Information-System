@@ -18,13 +18,23 @@ import SamplesPage    from '@/pages/samples/SamplesPage'
 
 // Lazy-loadable pages (buat stub dulu, isi nanti)
 import { lazy, Suspense } from 'react'
-const AnalysisPage      = lazy(() => import('@/pages/analysis/AnalysisPage'))
-const SpecificationsPage= lazy(() => import('@/pages/specifications/SpecificationsPage'))
-const ComplaintsPage    = lazy(() => import('@/pages/complaints/ComplaintsPage'))
-const DocumentsPage     = lazy(() => import('@/pages/documents/DocumentsPage'))
-const InventoryPage     = lazy(() => import('@/pages/inventory/InventoryPage'))
-const AuditPage         = lazy(() => import('@/pages/reports/AuditPage'))
-const ProfilePage       = lazy(() => import('@/pages/auth/ProfilePage'))
+const AnalysisPage          = lazy(() => import('@/pages/analysis/AnalysisPage'))
+const SpecificationsPage    = lazy(() => import('@/pages/specifications/SpecificationsPage'))
+const SpecificationDetail   = lazy(() => import('@/pages/specifications/SpecificationDetail'))
+const SpecificationForm     = lazy(() => import('@/pages/specifications/SpecificationForm'))
+const ComplaintListPage     = lazy(() => import('@/pages/complaints/ComplaintListPage'))
+const ComplaintDetailPage   = lazy(() => import('@/pages/complaints/ComplaintDetailPage'))
+const DocumentsPage         = lazy(() => import('@/pages/documents/DocumentsPage'))
+const DocumentDetail        = lazy(() => import('@/pages/documents/DocumentDetail'))
+const DocumentForm          = lazy(() => import('@/pages/documents/DocumentForm'))
+const InventoryPage         = lazy(() => import('@/pages/inventory/InventoryPage'))
+const InventoryForm         = lazy(() => import('@/pages/inventory/InventoryForm'))
+const InventoryDetail       = lazy(() => import('@/pages/inventory/InventoryDetail'))
+const PurchasePage          = lazy(() => import('@/pages/purchases/PurchasePage'))
+const PurchaseRequestForm   = lazy(() => import('@/pages/purchases/PurchaseRequestForm'))
+const ReportHistoryPage     = lazy(() => import('@/pages/reports/ReportHistoryPage'));
+const AuditLogPage          = lazy(() => import('@/pages/audit-log/AuditLogPage'));
+const ProfilePage           = lazy(() => import('@/pages/auth/ProfilePage'))
 
 // ── React Query client ────────────────────────────────────────────────────────
 const queryClient = new QueryClient({
@@ -115,9 +125,24 @@ export default function App() {
                   <SpecificationsPage />
                 </Suspense>
               } />
+              <Route path="specifications/:id" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                  <SpecificationDetail />
+                </Suspense>
+              } />
+              <Route path="specifications/new" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                  <SpecificationForm />
+                </Suspense>
+              } />
               <Route path="complaints" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
-                  <ComplaintsPage />
+                  <ComplaintListPage />
+                </Suspense>
+              } />
+              <Route path="complaints/:id" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ComplaintDetailPage />
                 </Suspense>
               } />
               <Route path="documents" element={
@@ -125,14 +150,54 @@ export default function App() {
                   <DocumentsPage />
                 </Suspense>
               } />
+              <Route path="documents/new" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <DocumentForm />
+                </Suspense>
+              } />
+              <Route path="documents/:id" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <DocumentDetail />
+                </Suspense>
+              } />
               <Route path="inventory" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <InventoryPage />
                 </Suspense>
               } />
-              <Route path="audit" element={
+              <Route path="inventory/new" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
-                  <AuditPage />
+                  <InventoryForm />
+                </Suspense>
+              } />
+              <Route path="inventory/edit/:id" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <InventoryForm />
+                </Suspense>
+              } />
+              <Route path="inventory/detail/:id" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <InventoryDetail />
+                </Suspense>
+              } />
+              <Route path="purchases" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <PurchasePage />
+                </Suspense>
+              } />
+              <Route path="purchases/new" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <PurchaseRequestForm />
+                </Suspense>
+              } />              
+              <Route path="reports" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ReportHistoryPage />
+                </Suspense>
+              } />
+              <Route path="audit-log" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <AuditLogPage />
                 </Suspense>
               } />
               <Route path="profile" element={

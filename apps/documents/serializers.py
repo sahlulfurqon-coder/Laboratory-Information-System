@@ -32,7 +32,7 @@ class ControlledDocumentListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'doc_number', 'title', 'category', 'category_name',
             'version_label', 'status', 'status_display',
-            'effective_date', 'review_date', 'uploaded_by_name', 'uploaded_at',
+            'effective_date', 'review_date', 'uploaded_by_name', 'created_at',
         ]
 
 
@@ -40,7 +40,7 @@ class ControlledDocumentDetailSerializer(serializers.ModelSerializer):
     revisions = DocumentRevisionSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     uploaded_by_name = serializers.CharField(
-        source='uploaded_by.full_name', read_only=True)
+        source='created_by.full_name', read_only=True)
     approved_by_name = serializers.CharField(
         source='approved_by.full_name', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
@@ -50,7 +50,7 @@ class ControlledDocumentDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = [
             'id', 'version', 'version_label', 'created_at', 'updated_at',
-            'uploaded_by', 'approved_by', 'approved_at',
+            'created_by', 'approved_by', 'approved_at',
             'submitted_for_approval_by', 'submitted_for_approval_at',
         ]
 

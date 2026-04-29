@@ -18,7 +18,9 @@ import SamplesPage    from '@/pages/samples/SamplesPage'
 
 // Lazy-loadable pages (buat stub dulu, isi nanti)
 import { lazy, Suspense } from 'react'
+import ResultsList from './pages/analysis/ResultsList'
 const AnalysisPage          = lazy(() => import('@/pages/analysis/AnalysisPage'))
+const AssignmentDetail      = lazy(() => import('@/pages/analysis/AssignmentDetail'))
 const SpecificationsPage    = lazy(() => import('@/pages/specifications/SpecificationsPage'))
 const SpecificationDetail   = lazy(() => import('@/pages/specifications/SpecificationDetail'))
 const SpecificationForm     = lazy(() => import('@/pages/specifications/SpecificationForm'))
@@ -27,6 +29,9 @@ const ComplaintDetailPage   = lazy(() => import('@/pages/complaints/ComplaintDet
 const DocumentsPage         = lazy(() => import('@/pages/documents/DocumentsPage'))
 const DocumentDetail        = lazy(() => import('@/pages/documents/DocumentDetail'))
 const DocumentForm          = lazy(() => import('@/pages/documents/DocumentForm'))
+const ExternalAnalysisPage  = lazy(() => import('@/pages/external/ExternalAnalysisPage'))
+const ExtAnalysisFormPage   = lazy(() => import('@/pages/external/ExtAnalysisFormPage'))
+const ProductDevPage        = lazy(() => import('@/pages/rnd/ProductDevPage'))
 const InventoryPage         = lazy(() => import('@/pages/inventory/InventoryPage'))
 const InventoryForm         = lazy(() => import('@/pages/inventory/InventoryForm'))
 const InventoryDetail       = lazy(() => import('@/pages/inventory/InventoryDetail'))
@@ -119,7 +124,7 @@ export default function App() {
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <AnalysisPage />
                 </Suspense>
-              } />
+              } />        
               <Route path="specifications" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <SpecificationsPage />
@@ -178,6 +183,21 @@ export default function App() {
               <Route path="inventory/detail/:id" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <InventoryDetail />
+                </Suspense>
+              } />
+              <Route path="external" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ExternalAnalysisPage />
+                </Suspense>
+              } />
+              <Route path="external/new" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ExtAnalysisFormPage />
+                </Suspense>
+              } />
+              <Route path="rnd" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ProductDevPage />
                 </Suspense>
               } />
               <Route path="purchases" element={

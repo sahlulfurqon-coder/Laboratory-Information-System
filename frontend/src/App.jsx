@@ -135,7 +135,6 @@ export default function App() {
               <Route path="samples" element={<SamplesPage />} />
               <Route path="samples/:id" element={<SamplesPage />} />
 
-<<<<<<< HEAD
               {/* Module Analysis - Grouped & Cleaned */}
               <Route path="analysis">
                 {/* /analysis */}

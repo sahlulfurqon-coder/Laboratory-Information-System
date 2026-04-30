@@ -10,7 +10,7 @@ import {
   LayoutDashboard, FlaskConical, Microscope, FileText,
   Package, MessageSquareWarning, FolderOpen, TestTubeDiagonal,
   ShoppingCart, ClipboardList, ChevronDown, Menu, X,
-  LogOut, User, Bell, ChevronRight, History
+  LogOut, User, Bell, ChevronRight, History, Blocks
 } from 'lucide-react'
 
 // ── Navigasi per role ─────────────────────────────────────────────────────────
@@ -32,6 +32,10 @@ const NAV_ITEMS = [
     icon: Microscope,
     to: '/analysis',
     roles: ['admin', 'qa_supervisor', 'analyst'],
+    children: [
+      { label: 'Antrian Tugas', to: '/analysis/assignments' },
+      { label: 'Hasil Analisa', to: '/analysis/results' },
+    ]
   },
   {
     label: 'Spesifikasi',
@@ -56,6 +60,12 @@ const NAV_ITEMS = [
     icon: TestTubeDiagonal,
     to: '/external',
     roles: ['admin', 'qa_supervisor', 'rnd'],
+  },
+  {
+    label: 'RnD',
+    icon: Blocks,
+    to: '/rnd',
+    roles: ['admin', 'rnd'],
   },
   {
     label: 'Inventaris',
@@ -84,16 +94,26 @@ const NAV_ITEMS = [
 ]
 
 const ROLE_LABELS = {
-  admin:        'Administrator',
-  qa_supervisor:'QA Supervisor',
-  rnd:          'R&D',
-  analyst:      'Analis',
+  admin: 'Administrator',
+  qa_supervisor: 'QA Supervisor',
+  rnd: 'R&D',
+  analyst: 'Analis',
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 function Sidebar({ open, onClose }) {
   const { user } = useAuth()
   const userRole = user?.role
+
+  // FIX: Tambahkan state dan fungsi toggle di dalam komponen Sidebar
+  const [expandedMenus, setExpandedMenus] = useState({})
+
+  const toggleMenu = (label) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }))
+  }
 
   const visibleNav = NAV_ITEMS.filter(
     (item) => !item.roles || item.roles.includes(userRole)
@@ -133,20 +153,77 @@ function Sidebar({ open, onClose }) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          {visibleNav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `nav-item ${isActive ? 'active' : ''}`
-              }
-            >
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+          {visibleNav.map((item) => {
+            const hasChildren = item.children && item.children.length > 0
+            const isExpanded = expandedMenus[item.label]
+
+            if (hasChildren) {
+              return (
+                <div key={item.label} className="space-y-1">
+                  <div className="relative flex items-center group">
+                    <NavLink
+                      to={item.to}
+                      onClick={() => {
+                        // Otomatis buka dropdown saat menu induk diklik
+                        if (!isExpanded) toggleMenu(item.label);
+                      }}
+                      className={({ isActive }) => `
+                        flex-1 flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                        ${isActive ? 'bg-slate-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50'}
+                      `}
+                    >
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="flex-1 text-left">{item.label}</span>
+                    </NavLink>
+                    
+                    {/* Tombol panah untuk toggle manual */}
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation(); // Mencegah navigasi NavLink terpicu
+                        toggleMenu(item.label);
+                      }}
+                      className="absolute right-2 p-1 hover:bg-slate-200 rounded-md transition-colors z-10"
+                    >
+                      <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                    </button>
+                  </div>
+                  
+                  {/* RENDER CHILDREN DI SINI */}
+                  {isExpanded && (
+                    <div className="ml-9 space-y-1 border-l border-slate-100 pl-2">
+                      {item.children.map((child) => (
+                        <NavLink
+                          key={child.to}
+                          to={child.to}
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            `block px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                            ${isActive ? 'text-primary-600 bg-primary-50' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`
+                          }
+                        >
+                          {child.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={onClose}
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              >
+                <item.icon className="w-4 h-4 flex-shrink-0" />
+                <span>{item.label}</span>
+              </NavLink>
+            )
+          })}
         </nav>
 
         {/* User info */}
@@ -191,12 +268,10 @@ function Header({ onMenuClick }) {
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        {/* Notif placeholder */}
         <button className="btn-ghost p-2 rounded-lg relative">
           <Bell className="w-4 h-4" />
         </button>
 
-        {/* Profile dropdown */}
         <div className="relative">
           <button
             onClick={() => setProfileOpen(!profileOpen)}

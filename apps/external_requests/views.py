@@ -32,7 +32,7 @@ class ExternalAnalysisRequestViewSet(viewsets.ModelViewSet):
     POST /api/external-analysis/{id}/add_result/     → input hasil manual
     """
     queryset = ExternalAnalysisRequest.objects.all().select_related(
-        'requester', 'related_sample'
+        'created_by', 'related_sample'
     ).prefetch_related('results').order_by('-created_at')
     serializer_class = ExternalAnalysisRequestSerializer
     permission_classes = [IsAuthenticated]

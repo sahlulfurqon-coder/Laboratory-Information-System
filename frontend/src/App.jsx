@@ -18,7 +18,19 @@ import SamplesPage    from '@/pages/samples/SamplesPage'
 
 // Lazy-loadable pages (buat stub dulu, isi nanti)
 import { lazy, Suspense } from 'react'
-const AnalysisPage          = lazy(() => import('@/pages/analysis/AnalysisPage'))
+const AnalysisDashboard     = lazy(() => import('@/pages/analysis/AnalysisDashboard'))
+const AnalysisChecklist     = lazy(() => import('@/pages/analysis/AnalysisChecklist'))
+const MyTasks               = lazy(() => import('@/pages/analysis/assignments/MyTasks'))
+const InstrumentList        = lazy(() => import('@/pages/analysis/instruments/InstrumentList'))
+const InstrumentForm        = lazy(() => import('@/pages/analysis/instruments/InstrumentForm'))
+const TestMethodList        = lazy(() => import('@/pages/analysis/methods/TestMethodList'))
+const TestParameterList     = lazy(() => import('@/pages/analysis/parameters/TestParameterList'))
+const TestParameterForm     = lazy(() => import('@/pages/analysis/parameters/TestParameterForm'))
+const AnalysisAssignmentList = lazy(() => import('@/pages/analysis/assignments/AnalysisAssignmentList'))
+const AnalysisAssignmentForm = lazy(() => import('@/pages/analysis/assignments/AnalysisAssignmentForm'))
+const AnalysisResultList    = lazy(() => import('@/pages/analysis/results/AnalysisResultList'))
+const AnalysisResultForm    = lazy(() => import('@/pages/analysis/results/AnalysisResultForm'))
+const AnalysisResultReview  = lazy(() => import('@/pages/analysis/results/AnalysisResultReview'))
 const SpecificationsPage    = lazy(() => import('@/pages/specifications/SpecificationsPage'))
 const SpecificationDetail   = lazy(() => import('@/pages/specifications/SpecificationDetail'))
 const SpecificationForm     = lazy(() => import('@/pages/specifications/SpecificationForm'))
@@ -27,6 +39,9 @@ const ComplaintDetailPage   = lazy(() => import('@/pages/complaints/ComplaintDet
 const DocumentsPage         = lazy(() => import('@/pages/documents/DocumentsPage'))
 const DocumentDetail        = lazy(() => import('@/pages/documents/DocumentDetail'))
 const DocumentForm          = lazy(() => import('@/pages/documents/DocumentForm'))
+const ExternalAnalysisPage  = lazy(() => import('@/pages/external/ExternalAnalysisPage'))
+const ExtAnalysisFormPage   = lazy(() => import('@/pages/external/ExtAnalysisFormPage'))
+const ProductDevPage        = lazy(() => import('@/pages/rnd/ProductDevPage'))
 const InventoryPage         = lazy(() => import('@/pages/inventory/InventoryPage'))
 const InventoryForm         = lazy(() => import('@/pages/inventory/InventoryForm'))
 const InventoryDetail       = lazy(() => import('@/pages/inventory/InventoryDetail'))
@@ -110,31 +125,102 @@ export default function App() {
               }
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard"   element={<DashboardPage />} />
-              <Route path="samples"     element={<SamplesPage />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="samples" element={<SamplesPage />} />
               <Route path="samples/:id" element={<SamplesPage />} />
 
-              {/* Lazy loaded */}
-              <Route path="analysis"      element={
-                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
-                  <AnalysisPage />
-                </Suspense>
-              } />
-              <Route path="specifications" element={
-                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
-                  <SpecificationsPage />
-                </Suspense>
-              } />
-              <Route path="specifications/:id" element={
-                <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
-                  <SpecificationDetail />
-                </Suspense>
-              } />
-              <Route path="specifications/new" element={
-                <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
-                  <SpecificationForm />
-                </Suspense>
-              } />
+              {/* Module Analysis - Grouped & Cleaned */}
+              <Route path="analysis">
+                {/* /analysis */}
+                <Route 
+                  index 
+                  element={
+                    <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                      <AnalysisDashboard />
+                    </Suspense>
+                  } 
+                />
+                <Route path="analysis-checklist" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <AnalysisChecklist />
+                  </Suspense>
+                } />                
+
+                {/* /analysis/my-tasks - Perhatikan: tidak pakai 'analysis/' lagi di path */}
+                <Route path="my-tasks" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <MyTasks />
+                  </Suspense>
+                } />
+
+                {/* Instruments Management */}
+                <Route path="instruments" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <InstrumentList />
+                  </Suspense>
+                } />
+                <Route path="instruments/new" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <InstrumentForm />
+                  </Suspense>
+                } />
+                <Route path="instruments/edit/:id" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <InstrumentForm />
+                  </Suspense>
+                } />
+
+                {/* Methods & Parameters */}
+                <Route path="methods" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <TestMethodList />
+                  </Suspense>
+                } />
+                <Route path="parameters" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <TestParameterList />
+                  </Suspense>
+                } />
+                <Route path="parameters/new" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <TestParameterForm />
+                  </Suspense>
+                } />
+
+                {/* Assignments & Results Workflow */}
+                <Route path="assignments" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <AnalysisAssignmentList />
+                  </Suspense>
+                } />
+                <Route path="assignments/new" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <AnalysisAssignmentForm />
+                  </Suspense>
+                } />
+                <Route path="results" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <AnalysisResultList />
+                  </Suspense>
+                } />
+                <Route path="results/input/:id" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <AnalysisResultForm />
+                  </Suspense>
+                } />
+                <Route path="results/review/:id" element={
+                  <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                    <AnalysisResultReview />
+                  </Suspense>
+                } />
+              </Route>
+
+              <Route path="specifications">
+                <Route index element={<Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}><SpecificationsPage /></Suspense>} />
+                <Route path="new" element={<Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}><SpecificationForm /></Suspense>} />
+                <Route path=":id" element={<Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}><SpecificationDetail /></Suspense>} />
+              </Route>
+
               <Route path="complaints" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <ComplaintListPage />
@@ -178,6 +264,21 @@ export default function App() {
               <Route path="inventory/detail/:id" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <InventoryDetail />
+                </Suspense>
+              } />
+              <Route path="external" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ExternalAnalysisPage />
+                </Suspense>
+              } />
+              <Route path="external/new" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ExtAnalysisFormPage />
+                </Suspense>
+              } />
+              <Route path="rnd" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <ProductDevPage />
                 </Suspense>
               } />
               <Route path="purchases" element={

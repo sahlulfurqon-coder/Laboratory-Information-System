@@ -61,6 +61,12 @@ const NAV_ITEMS = [
     to: '/external',
     roles: ['admin', 'qa_supervisor', 'rnd'],
   },
+    {
+    label: 'RnD',
+    icon: Blocks,
+    to: '/rnd',
+    roles: ['admin', 'rnd'],
+  },
   {
     label: 'RnD',
     icon: Blocks,

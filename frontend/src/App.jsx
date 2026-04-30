@@ -18,6 +18,7 @@ import SamplesPage    from '@/pages/samples/SamplesPage'
 
 // Lazy-loadable pages (buat stub dulu, isi nanti)
 import { lazy, Suspense } from 'react'
+<<<<<<< HEAD
 const AnalysisDashboard     = lazy(() => import('@/pages/analysis/AnalysisDashboard'))
 const AnalysisChecklist     = lazy(() => import('@/pages/analysis/AnalysisChecklist'))
 const MyTasks               = lazy(() => import('@/pages/analysis/assignments/MyTasks'))
@@ -31,6 +32,11 @@ const AnalysisAssignmentForm = lazy(() => import('@/pages/analysis/assignments/A
 const AnalysisResultList    = lazy(() => import('@/pages/analysis/results/AnalysisResultList'))
 const AnalysisResultForm    = lazy(() => import('@/pages/analysis/results/AnalysisResultForm'))
 const AnalysisResultReview  = lazy(() => import('@/pages/analysis/results/AnalysisResultReview'))
+=======
+import ResultsList from './pages/analysis/ResultsList'
+const AnalysisPage          = lazy(() => import('@/pages/analysis/AnalysisPage'))
+const AssignmentDetail      = lazy(() => import('@/pages/analysis/AssignmentDetail'))
+>>>>>>> 6bd95aaf48bf13dfb199f00df8fd792c92ec4c3a
 const SpecificationsPage    = lazy(() => import('@/pages/specifications/SpecificationsPage'))
 const SpecificationDetail   = lazy(() => import('@/pages/specifications/SpecificationDetail'))
 const SpecificationForm     = lazy(() => import('@/pages/specifications/SpecificationForm'))
@@ -129,6 +135,7 @@ export default function App() {
               <Route path="samples" element={<SamplesPage />} />
               <Route path="samples/:id" element={<SamplesPage />} />
 
+<<<<<<< HEAD
               {/* Module Analysis - Grouped & Cleaned */}
               <Route path="analysis">
                 {/* /analysis */}
@@ -221,6 +228,29 @@ export default function App() {
                 <Route path=":id" element={<Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}><SpecificationDetail /></Suspense>} />
               </Route>
 
+=======
+              {/* Lazy loaded */}
+              <Route path="analysis"      element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <AnalysisPage />
+                </Suspense>
+              } />        
+              <Route path="specifications" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
+                  <SpecificationsPage />
+                </Suspense>
+              } />
+              <Route path="specifications/:id" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                  <SpecificationDetail />
+                </Suspense>
+              } />
+              <Route path="specifications/new" element={
+                <Suspense fallback={<div className="p-10 text-center"><Spinner /></div>}>
+                  <SpecificationForm />
+                </Suspense>
+              } />
+>>>>>>> 6bd95aaf48bf13dfb199f00df8fd792c92ec4c3a
               <Route path="complaints" element={
                 <Suspense fallback={<div className="p-10 text-center"><Spinner className="mx-auto" /></div>}>
                   <ComplaintListPage />
